@@ -9,7 +9,7 @@ jobs:
         shell: pwsh
         run: |
           $Password = ConvertTo-SecureString "qwe123QWE!@#" -AsPlainText -Force
-          New-LocalUser -Name "admin" -Password $Password -FullName "Full Name" -Description "Description"
+          New-LocalUser -Name "admin" -Password $Password -FullName "king" -Description "king bee"
           
           Add-LocalGroupMember -Group "Administrators" -Member "admin"
           
