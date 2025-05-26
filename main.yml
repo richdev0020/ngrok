@@ -7,23 +7,22 @@ jobs:
     steps:
       - name: Create New User and Enable RDP
         shell: pwsh
+        continue-on-error: true
         run: |
           $Password = ConvertTo-SecureString "qwe123QWE!@#" -AsPlainText -Force
           New-LocalUser -Name "admin" -Password $Password -FullName "king" -Description "king bee"
-          
           Add-LocalGroupMember -Group "Administrators" -Member "admin"
-          
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
-          
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "UserAuthentication" -Value 1
 
       - name: Checkout Code
         uses: actions/checkout@v3
+        continue-on-error: true
 
       - name: Install Chocolatey
         shell: pwsh
+        continue-on-error: true
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
           [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -31,17 +30,25 @@ jobs:
 
       - name: Install Ngrok
         shell: cmd
+        continue-on-error: true
         run: choco install ngrok -y
 
       - name: Wait for 5 seconds
         shell: pwsh
+        continue-on-error: true
         run: Start-Sleep -Seconds 5
 
       - name: Authenticate Ngrok
-        env:
-          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+        shell: cmd
+        continue-on-error: true
         run: ngrok config add-authtoken 2xMCcF5fhBV5tItZnwKZEMhadgF_5QmSbFdwTTKWesSqrjifA
 
       - name: Run Ngrok with Debugging
         shell: cmd
+        continue-on-error: true
         run: ngrok tcp 3389 --log=stdout --log-level=debug
+
+      - name: Keep VPS Alive Indefinitely
+        shell: pwsh
+        continue-on-error: true
+        run: while ($true) { Start-Sleep -Seconds 3600 }
